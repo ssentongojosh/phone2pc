@@ -2,7 +2,9 @@ import http.server
 import socketserver
 import os
 import cgi
-import json
+import json # Still needed if you use it elsewhere, but not for /list_files response
+import html # Import the html module for escaping
+import urllib.parse
 
 UPLOAD_DIR = os.getcwd()
 PORT = 80
@@ -36,39 +38,63 @@ class UploadHandler(http.server.SimpleHTTPRequestHandler):
             self.send_response(400)
             self.end_headers()
             self.wfile.write(b"No file was uploaded.\\n")
-
+            
     def do_GET(self):
-        if self.path == '/list_files':
+        parsed_url = urllib.parse.urlparse(self.path)
+        path = parsed_url.path
+        query = urllib.parse.parse_qs(parsed_url.query)
+
+        if path == '/list_files':
+            requested_subpath = query.get('path', [''])[0]
+            current_dir = os.path.join(LINK_FILES_DIR, requested_subpath)
+
             try:
-                # Check if the symbolic link directory exists
-                if os.path.exists(LINK_FILES_DIR) and os.path.isdir(LINK_FILES_DIR):
-                    # Read the contents of the symbolic link directory
-                    files = os.listdir(LINK_FILES_DIR)
+                # Security check
+                if not os.path.commonpath([os.path.realpath(current_dir), os.path.realpath(LINK_FILES_DIR)]) == os.path.realpath(LINK_FILES_DIR):
+                     raise Exception("Access denied: Attempted directory traversal.")
+
+                if os.path.exists(current_dir) and os.path.isdir(current_dir):
+                    items = os.listdir(current_dir)
                     
-                    # Prepare the success response
+                    html_content = f"<h2>Contents of {html.escape(requested_subpath or 'C:/Users/Public')}:</h2><ul>"
+
+                    # Add a ".." link
+                    if requested_subpath:
+                         parent_dir = os.path.dirname(requested_subpath)
+                         html_content += f'<li><a href="#" class="folder-link" data-path="{urllib.parse.quote_plus(parent_dir)}">..</a></li>' # Use # and data-path
+
+
+                    for item in items:
+                        item_path = os.path.join(current_dir, item)
+                        safe_item = html.escape(item)
+                        
+                        if os.path.isdir(item_path):
+                            # If it's a directory, create a link with data-path
+                            new_path = os.path.join(requested_subpath, item)
+                            html_content += f'<li><a href="#" class="folder-link" data-path="{urllib.parse.quote_plus(new_path)}">{safe_item}</a></li>' # Use # and data-path
+                        else:
+                            # If it's a file, just display the name
+                            html_content += f"<li>{safe_item}</li>"
+                    html_content += "</ul>"
+
                     self.send_response(200)
-                    self.send_header('Content-type', 'application/json')
+                    self.send_header('Content-type', 'text/html')
                     self.end_headers()
-                    self.wfile.write(json.dumps(files).encode('utf-8'))
+                    self.wfile.write(html_content.encode('utf-8'))
                 else:
-                    # If the symbolic link directory doesn't exist
                     self.send_response(404)
-                    self.send_header('Content-type', 'application/json') # Send JSON even on 404
+                    self.send_header('Content-type', 'text/html')
                     self.end_headers()
-                    # Send an empty list or an error indicator in JSON
-                    self.wfile.write(json.dumps({"error": "Symbolic link directory 'list_files' not found or is not a directory."}).encode('utf-8'))
+                    self.wfile.write(f"<h2>Error: Directory '{html.escape(requested_subpath)}' not found or is not a directory.</h2>".encode('utf-8'))
             except Exception as e:
-                # Handle any errors that occur while reading the directory
                 self.send_response(500)
-                self.send_header('Content-type', 'application/json') # Send JSON even on 500
+                self.send_header('Content-type', 'text/html')
                 self.end_headers()
-                # Send an error message in JSON
-                self.wfile.write(json.dumps({"error": f"Error listing files: {e}"}).encode('utf-8'))
+                self.wfile.write(f"<h2>Error listing files: {html.escape(str(e))}</h2>".encode('utf-8'))
         else:
-            # For any other GET requests, use the default handler
             super().do_GET()
 
-
+   
 handler = UploadHandler
 with socketserver.TCPServer(("", PORT), handler) as httpd:
     print(f"Serving at port {PORT}")

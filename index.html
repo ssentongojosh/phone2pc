@@ -2,9 +2,9 @@
 <html>
   <head>
     <title>Upload File</title>
-    <link rel="stylesheet" href="style.css" >
-    <meta charset="UTF-8" >
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" >
+    <link rel="stylesheet" href="style.css" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   </head>
   <body>
     <h1>Upload a File</h1>
@@ -19,47 +19,55 @@
     </form>
 
     <div id="folder-structure">
-        <h2>Folder Structure (C:\Users\Public)</h2>
-        <button id="view-files-button">View Files</button> <!-- Add this button -->
-        <ul id="file-list"></ul>
+      <h2>Folder Structure (C:\Users\Public)</h2>
+      <iframe src="/list_files" width="100%" height="400px"></iframe>
+      <!-- Add this button -->
+      <ul id="file-list"></ul>
     </div>
 
     <script>
-        async function fetchFileList() {
-            try {
-                const response = await fetch('/list_files');
-                const files = await response.json();
-                const fileListElement = document.getElementById('file-list');
-                fileListElement.innerHTML = ''; // Clear existing list
+      const iframe = document.getElementById("file-list-iframe");
 
-                if (files.error) { // Check if the response contains an error
-                    const listItem = document.createElement('li');
-                    listItem.textContent = `Error: ${files.error}`;
-                    fileListElement.appendChild(listItem);
-                } else {
-                    files.forEach(item => {
-                        const listItem = document.createElement('li');
-                        // You might want to add icons or differentiate files/folders later
-                        // For now, just display the name
-                        listItem.textContent = item;
-                        fileListElement.appendChild(listItem);
-                    });
-                }
-            } catch (error) {
-                console.error('Error fetching file list:', error);
-                const fileListElement = document.getElementById('file-list');
-                fileListElement.innerHTML = '<li>Error loading file list.</li>';
-            }
+      // Function to add event listeners to folder links inside the iframe
+      function addFolderLinkListeners() {
+        try {
+          // Get the content document of the iframe
+          const iframeDoc =
+            iframe.contentDocument || iframe.contentWindow.document;
+
+          // Find all links with the class 'folder-link'
+          const folderLinks = iframeDoc.querySelectorAll(".folder-link");
+
+          // Add click event listener to each folder link
+          folderLinks.forEach((link) => {
+            link.addEventListener("click", handleFolderClick);
+            link.addEventListener("touchend", handleFolderClick); // Add touchend
+          });
+
+          function handleFolderClick(event) {
+            event.preventDefault(); // Prevent default
+            const folderPath = this.dataset.path;
+            iframe.src = `/list_files?path=${folderPath}`;
+          }
+        } catch (error) {
+          console.error(
+            "Error accessing iframe content or adding listeners:",
+            error
+          );
+          // Handle cases where iframe content might not be accessible (e.g., cross-origin issues, though not expected here)
         }
+      }
 
-        // Get the button element
-        const viewFilesButton = document.getElementById('view-files-button');
+      // Add event listener to the iframe to detect when its content has loaded
+      iframe.addEventListener("load", addFolderLinkListeners);
 
-        // Add an event listener to the button
-        viewFilesButton.addEventListener('click', fetchFileList);
-
-        // Remove the automatic call to fetchFileList() on page load
-        // fetchFileList(); 
+      // Initial call in case the iframe content is already loaded when the script runs
+      if (
+        iframe.contentDocument &&
+        iframe.contentDocument.readyState === "complete"
+      ) {
+        addFolderLinkListeners();
+      }
     </script>
   </body>
 </html>
