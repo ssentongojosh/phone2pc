@@ -1,3 +1,28 @@
+# Get the ID and name of the current user
+$myWindowsID = [System.Security.Principal.WindowsIdentity]::GetCurrent()
+$myWindowsPrincipal = New-Object System.Security.Principal.WindowsPrincipal($myWindowsID)
+
+# Check to see if we're currently running "as Administrator"
+$adminRole = [System.Security.Principal.WindowsBuiltInRole]::Administrator
+
+if (-not ($myWindowsPrincipal.IsInRole($adminRole))) {
+    # We are not running as Administrator, so reopen the script as Administrator
+    $newProcess = New-Object System.Diagnostics.ProcessStartInfo 'PowerShell';
+
+    # Specify the PowerShell script to run
+    $newProcess.Arguments = "& '" + (Get-AuthenticatingUser).Path + "'" # Not sure if Get-AuthenticatingUser works here, need to check
+
+    # This works:
+    $newProcess.Arguments = "& '" + $MyInvocation.MyCommand.Path + "'"
+
+    # Run the PowerShell process as Administrator
+    $newProcess.Verb = 'runas';
+
+    [System.Diagnostics.Process]::Start($newProcess);
+
+    # Exit the current non-elevated process
+    exit;
+}
 
 netsh wlan set hostednetwork mode=allow ssid="TestHotspot" key="password"
 
