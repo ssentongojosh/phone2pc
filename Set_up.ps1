@@ -42,12 +42,27 @@ if ($adapter) {
 }
 
 # Create symbolic link to C:\Users\Public
-# Check if the symbolic link already exists
-if (-not (Test-Path "list_files" -PathType SymbolicLink)) {
-    # Create the symbolic link
-    cmd /c mklink /d list_files "C:\Users\Public"
+$linkPath = "list_files"
+$targetPath = "C:\Users\Public"
+
+# Check if the item at $linkPath exists
+if (Test-Path $linkPath) {
+    # If it exists, check if it's already a symbolic link to the correct target
+    $item = Get-Item $linkPath
+    if ($item.LinkType -eq "SymbolicLink" -and $item.Target -eq $targetPath) {
+        Write-Host "Symbolic link '$linkPath' to '$targetPath' already exists."
+    } else {
+        # If it's not the correct symbolic link (or not a symbolic link at all), remove it
+        Write-Host "Removing existing item at '$linkPath' before creating symbolic link."
+        Remove-Item $linkPath -Force
+        # Now create the symbolic link
+        cmd /c mklink /d $linkPath $targetPath
+        Write-Host "Symbolic link '$linkPath' to '$targetPath' created."
+    }
 } else {
-    Write-Host "Symbolic link 'list_files' already exists."
+    # If the item doesn't exist, create the symbolic link
+    cmd /c mklink /d $linkPath $targetPath
+    Write-Host "Symbolic link '$linkPath' to '$targetPath' created."
 }
 
 python.exe .\uploader.py
