@@ -10,20 +10,6 @@ PORT = 80
 PUBLIC_FOLDER = "C:\\Users\\Public"
 
 class UploadHandler(http.server.SimpleHTTPRequestHandler):
-    def do_GET(self):
-        if self.path == '/list_files':
- self.send_response(200)
-            self.send_header('Content-type', 'application/json')
-            self.end_headers()
-            try:
-                items = os.listdir(PUBLIC_FOLDER)
-                # Return a list of items, not a dictionary
-                response = items
-                self.wfile.write(json.dumps(response).encode('utf-8'))
-            except FileNotFoundError:
-                self.send_error(404, "Folder not found")
-        else:
- super().do_GET()
 
     def do_POST(self):
         form = cgi.FieldStorage(

@@ -41,5 +41,13 @@ if ($adapter) {
     Write-Host "Hotspot adapter not found!"
 }
 
+# Create symbolic link to C:\Users\Public
+# Check if the symbolic link already exists
+if (-not (Test-Path "list_files" -PathType SymbolicLink)) {
+    # Create the symbolic link
+    cmd /c mklink /d list_files "C:\Users\Public"
+} else {
+    Write-Host "Symbolic link 'list_files' already exists."
+}
 
 python.exe .\uploader.py
