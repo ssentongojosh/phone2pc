@@ -3,10 +3,27 @@ import socketserver
 import os
 import cgi
 
+import json
+
 UPLOAD_DIR = os.getcwd()
 PORT = 80
+PUBLIC_FOLDER = "C:\\Users\\Public"
 
 class UploadHandler(http.server.SimpleHTTPRequestHandler):
+    def do_GET(self):
+        if self.path == '/list_files':
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json')
+            self.end_headers()
+            try:
+                items = os.listdir(PUBLIC_FOLDER)
+                response = {'files': items}
+                self.wfile.write(json.dumps(response).encode('utf-8'))
+            except FileNotFoundError:
+                self.send_error(404, "Folder not found")
+        else:
+            http.server.SimpleHTTPRequestHandler.do_GET(self)
+
     def do_POST(self):
         form = cgi.FieldStorage(
             fp=self.rfile,
