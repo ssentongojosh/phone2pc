@@ -47,7 +47,6 @@ class UploadHandler(http.server.SimpleHTTPRequestHandler):
         if path == '/list_files':
             requested_subpath = query.get('path', [''])[0]
             current_dir = os.path.join(LINK_FILES_DIR, requested_subpath)
-
             try:
                 # Security check
                 if not os.path.commonpath([os.path.realpath(current_dir), os.path.realpath(LINK_FILES_DIR)]) == os.path.realpath(LINK_FILES_DIR):
@@ -55,13 +54,17 @@ class UploadHandler(http.server.SimpleHTTPRequestHandler):
 
                 if os.path.exists(current_dir) and os.path.isdir(current_dir):
                     items = os.listdir(current_dir)
-                    
-                    html_content = f"<h2>Contents of {html.escape(requested_subpath or 'C:/Users/Public')}:</h2><ul>"
+
+                    # --- Start of modification ---
+                    # Wrap the content within the div#folder-structure
+                    html_content = '<div id="folder-structure">' 
+                    html_content += f"<h2>Contents of {html.escape(requested_subpath or 'C:/Users/Public')}:</h2><ul>"
 
                     # Add a ".." link
                     if requested_subpath:
                          parent_dir = os.path.dirname(requested_subpath)
-                         html_content += f'<li><a href="#" class="folder-link" data-path="{urllib.parse.quote_plus(parent_dir)}">..</a></li>' # Use # and data-path
+                         # Note: Removed class="folder-link" and data-path since we are navigating directly now
+                         html_content += f'<li><a href="/list_files?path={urllib.parse.quote_plus(parent_dir)}">..</a></li>' 
 
 
                     for item in items:
@@ -69,13 +72,17 @@ class UploadHandler(http.server.SimpleHTTPRequestHandler):
                         safe_item = html.escape(item)
                         
                         if os.path.isdir(item_path):
-                            # If it's a directory, create a link with data-path
+                            # If it's a directory, create a link
                             new_path = os.path.join(requested_subpath, item)
-                            html_content += f'<li><a href="#" class="folder-link" data-path="{urllib.parse.quote_plus(new_path)}">{safe_item}</a></li>' # Use # and data-path
+                            # Note: Removed class="folder-link" and data-path
+                            html_content += f'<li><a href="/list_files?path={urllib.parse.quote_plus(new_path)}">{safe_item}</a></li>' 
                         else:
                             # If it's a file, just display the name
                             html_content += f"<li>{safe_item}</li>"
                     html_content += "</ul>"
+                    html_content += '</div>' # Close the div
+                    # --- End of modification ---
+
 
                     self.send_response(200)
                     self.send_header('Content-type', 'text/html')
