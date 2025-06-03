@@ -102,7 +102,7 @@ class UploadHandler(http.server.SimpleHTTPRequestHandler):
                     html_content = f'''<!DOCTYPE html>
 <html>
 <head>
-    <title>Not Found</title>
+    <title>Not Found</title>'''
                     self.send_response(404)
                     self.send_header('Content-type', 'text/html')
                     self.end_headers()
@@ -110,11 +110,8 @@ class UploadHandler(http.server.SimpleHTTPRequestHandler):
             except Exception as e:
                 self.send_response(500)
                 self.send_header('Content-type', 'text/html')
-                    <link rel="stylesheet" href="/style.css"> <!-- Link to your style.css -->
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-</head>
-<body>'''s
+    
+#     
                 self.end_headers()
                 self.wfile.write(f"<h2>Error listing files: {html.escape(str(e))}</h2>".encode('utf-8'))
         else:
