@@ -45,7 +45,7 @@ class UploadHandler(http.server.SimpleHTTPRequestHandler):
                     # Read the contents of the symbolic link directory
                     files = os.listdir(LINK_FILES_DIR)
                     
-                    # Prepare the response
+                    # Prepare the success response
                     self.send_response(200)
                     self.send_header('Content-type', 'application/json')
                     self.end_headers()
@@ -53,18 +53,21 @@ class UploadHandler(http.server.SimpleHTTPRequestHandler):
                 else:
                     # If the symbolic link directory doesn't exist
                     self.send_response(404)
-                    self.send_header('Content-type', 'text/plain')
+                    self.send_header('Content-type', 'application/json') # Send JSON even on 404
                     self.end_headers()
-                    self.wfile.write(b"Symbolic link directory 'list_files' not found or is not a directory.")
+                    # Send an empty list or an error indicator in JSON
+                    self.wfile.write(json.dumps({"error": "Symbolic link directory 'list_files' not found or is not a directory."}).encode('utf-8'))
             except Exception as e:
                 # Handle any errors that occur while reading the directory
                 self.send_response(500)
-                self.send_header('Content-type', 'text/plain')
+                self.send_header('Content-type', 'application/json') # Send JSON even on 500
                 self.end_headers()
-                self.wfile.write(f"Error listing files: {e}".encode('utf-8'))
+                # Send an error message in JSON
+                self.wfile.write(json.dumps({"error": f"Error listing files: {e}"}).encode('utf-8'))
         else:
-            # For any other GET requests, use the default handler (e.g., serving index.html)
+            # For any other GET requests, use the default handler
             super().do_GET()
+
 
 handler = UploadHandler
 with socketserver.TCPServer(("", PORT), handler) as httpd:
