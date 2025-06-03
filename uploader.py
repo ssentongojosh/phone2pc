@@ -55,10 +55,19 @@ class UploadHandler(http.server.SimpleHTTPRequestHandler):
                 if os.path.exists(current_dir) and os.path.isdir(current_dir):
                     items = os.listdir(current_dir)
 
-                    # --- Start of modification ---
-                    # Wrap the content within the div#folder-structure
-                    html_content = '<div id="folder-structure">' 
-                    html_content += f"<h2>Contents of {html.escape(requested_subpath or 'C:/Users/Public')}:</h2><ul>"
+                    # Generate the HTML for the file listing page
+                    html_content = f'''<!DOCTYPE html>
+<html>
+<head>
+    <title>File Listing: {html.escape(requested_subpath or "C:/Users/Public")}</title>
+    <link rel="stylesheet" href="/style.css"> <!-- Link to your style.css -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+    <div id="folder-structure">
+        <h2>Contents of {html.escape(requested_subpath or 'C:/Users/Public')}:</h2>
+        <ul>'''
 
                     # Add a ".." link
                     if requested_subpath:
