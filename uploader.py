@@ -12,7 +12,7 @@ PUBLIC_FOLDER = "C:\\Users\\Public"
 class UploadHandler(http.server.SimpleHTTPRequestHandler):
     def do_GET(self):
         if self.path == '/list_files':
- self.send_response(200)
+            self.send_response(200)
             self.send_header('Content-type', 'application/json')
             self.end_headers()
             try:
