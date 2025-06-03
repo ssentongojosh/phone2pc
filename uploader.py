@@ -114,7 +114,7 @@ class UploadHandler(http.server.SimpleHTTPRequestHandler):
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
-<body>
+<body>'''s
                 self.end_headers()
                 self.wfile.write(f"<h2>Error listing files: {html.escape(str(e))}</h2>".encode('utf-8'))
         else:
