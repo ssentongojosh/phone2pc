@@ -20,6 +20,7 @@
 
     <div id="folder-structure">
         <h2>Folder Structure (C:\Users\Public)</h2>
+        <button id="view-files-button">View Files</button> <!-- Add this button -->
         <ul id="file-list"></ul>
     </div>
 
@@ -31,20 +32,34 @@
                 const fileListElement = document.getElementById('file-list');
                 fileListElement.innerHTML = ''; // Clear existing list
 
-                files.forEach(item => {
+                if (files.error) { // Check if the response contains an error
                     const listItem = document.createElement('li');
-                    // You might want to add icons or differentiate files/folders later
-                    // For now, just display the name
-                    listItem.textContent = item; 
+                    listItem.textContent = `Error: ${files.error}`;
                     fileListElement.appendChild(listItem);
-                });
+                } else {
+                    files.forEach(item => {
+                        const listItem = document.createElement('li');
+                        // You might want to add icons or differentiate files/folders later
+                        // For now, just display the name
+                        listItem.textContent = item;
+                        fileListElement.appendChild(listItem);
+                    });
+                }
             } catch (error) {
                 console.error('Error fetching file list:', error);
                 const fileListElement = document.getElementById('file-list');
                 fileListElement.innerHTML = '<li>Error loading file list.</li>';
             }
         }
-        fetchFileList(); // Call the function to fetch the file list when the page loads
+
+        // Get the button element
+        const viewFilesButton = document.getElementById('view-files-button');
+
+        // Add an event listener to the button
+        viewFilesButton.addEventListener('click', fetchFileList);
+
+        // Remove the automatic call to fetchFileList() on page load
+        // fetchFileList(); 
     </script>
   </body>
 </html>
