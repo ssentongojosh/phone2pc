@@ -1,33 +1,105 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Upload File</title>
+    <title>CaptivePortal - File Transfer</title>
     <link rel="stylesheet" href="style.css" />
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   </head>
   <body>
-    <h1>Upload a File</h1>
+    <!-- Dark mode toggle button -->
+    <button class="dark-mode-toggle" onclick="toggleDarkMode()" aria-label="Toggle dark mode"></button>
+    
+    <h1>File Transfer Hub</h1>
     <form
       method="POST"
       action="http://192.168.137.1:80"
       enctype="multipart/form-data"
+      id="uploadForm"
     >
-      <input type="file" name="file" />
-      <br /><br />
-      <input type="submit" value="Upload" />
+      <div class="file-input-wrapper">
+        <input type="file" name="file" id="fileInput" />
+        <label for="fileInput" class="file-input-label">
+          Choose File to Upload
+        </label>
+      </div>
+      <button type="submit" id="uploadBtn">Upload File</button>
     </form>
 
     <div id="folder-structure">
-      <h2>Folder Structure (C:\Users\Public)</h2>
-      <!-- Add a link to the file listing endpoint -->
-      <p><a href="/list_files">View Files in C:\Users\Public</a></p>
-      <!-- Removed the iframe and the ul -->
-      <!-- <iframe id="file-list-iframe" src="/list_files" width="100%" height="400px"></iframe> -->
-      <!-- <ul id="file-list"></ul> -->
+      <h2>Browse PC Files</h2>
+      <p style="text-align: center; margin-bottom: 20px">
+        <a href="/list_files" class="back-to-upload">Browse Files</a>
+      </p>
     </div>
 
-    <!-- Removed all the JavaScript related to the iframe -->
-    <!-- <script> ... </script> -->
+    <script>
+      // Dark mode functionality
+      function toggleDarkMode() {
+        const html = document.documentElement;
+        const currentTheme = html.getAttribute('data-theme');
+        
+        if (currentTheme === 'dark') {
+          html.setAttribute('data-theme', 'light');
+          localStorage.setItem('theme', 'light');
+        } else {
+          html.setAttribute('data-theme', 'dark');
+          localStorage.setItem('theme', 'dark');
+        }
+      }
+
+      // Initialize theme on page load
+      function initTheme() {
+        const savedTheme = localStorage.getItem('theme');
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        
+        if (savedTheme) {
+          document.documentElement.setAttribute('data-theme', savedTheme);
+        } else if (systemPrefersDark) {
+          document.documentElement.setAttribute('data-theme', 'dark');
+        }
+      }
+
+      // Listen for system theme changes
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+        if (!localStorage.getItem('theme')) {
+          document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light');
+        }
+      });
+
+      // Enhanced file input functionality
+      const fileInput = document.getElementById("fileInput");
+      const fileLabel = document.querySelector(".file-input-label");
+      const uploadForm = document.getElementById("uploadForm");
+      const uploadBtn = document.getElementById("uploadBtn");
+
+      fileInput.addEventListener("change", function () {
+        const fileName = this.files[0]?.name;
+        const wrapper = this.parentElement;
+        
+        if (fileName) {
+          wrapper.classList.add("file-selected");
+          fileLabel.innerHTML = `<span style="color: inherit;">✅ ${fileName}</span>`;
+        } else {
+          wrapper.classList.remove("file-selected");
+          fileLabel.innerHTML = "📤 Choose File to Upload";
+        }
+      });
+
+      uploadForm.addEventListener("submit", function (e) {
+        if (!fileInput.files.length) {
+          e.preventDefault();
+          alert("Please select a file to upload!");
+          return;
+        }
+        
+        uploadBtn.disabled = true;
+        uploadBtn.classList.add("loading");
+        uploadBtn.innerHTML = "⏳ Uploading...";
+      });
+
+      // Initialize theme when page loads
+      initTheme();
+    </script>
   </body>
 </html>

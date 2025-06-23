@@ -10,7 +10,7 @@ if (-not ($myWindowsPrincipal.IsInRole($adminRole))) {
     $newProcess = New-Object System.Diagnostics.ProcessStartInfo 'PowerShell';
 
     # Specify the PowerShell script to run
-    $newProcess.Arguments = "& '" + (Get-AuthenticatingUser).Path + "'" # Not sure if Get-AuthenticatingUser works here, need to check
+    # $newProcess.Arguments = "& '" + (Get-AuthenticatingUser).Path + "'" # Not sure if Get-AuthenticatingUser works here, need to check
 
     # This works:
     $newProcess.Arguments = "& '" + $MyInvocation.MyCommand.Path + "'"
@@ -65,4 +65,39 @@ if (Test-Path $linkPath) {
     Write-Host "Symbolic link '$linkPath' to '$targetPath' created."
 }
 
-python.exe .\uploader.py
+# Try to run Python with different common commands
+Write-Host "Starting Python server..."
+$scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+Set-Location $scriptDir
+
+# Try different Python commands in order of preference
+$pythonCommands = @("python", "python.exe", "py", "python3")
+$pythonFound = $false
+
+foreach ($cmd in $pythonCommands) {
+    try {
+        Write-Host "Trying: $cmd"
+        & $cmd --version 2>$null
+        if ($LASTEXITCODE -eq 0) {
+            Write-Host "Found Python: $cmd"
+            Write-Host "Starting server on http://192.168.137.1:80"
+            Write-Host "Press Ctrl+C to stop the server"
+            & $cmd .\uploader.py
+            $pythonFound = $true
+            break
+        }
+    } catch {
+        Write-Host "$cmd not found, trying next..."
+    }
+}
+
+if (-not $pythonFound) {
+    Write-Host "ERROR: Python not found! Please install Python or add it to your PATH."
+    Write-Host "You can download Python from: https://www.python.org/downloads/"
+    Write-Host "Make sure to check 'Add Python to PATH' during installation."
+    Write-Host ""
+    Write-Host "Alternatively, run the uploader manually:"
+    Write-Host "cd '$scriptDir'"
+    Write-Host "python uploader.py"
+    pause
+}

@@ -1,0 +1,27 @@
+# CaptivePortal Application Icon
+# 
+# To create an actual .ico file, you can:
+# 1. Use online converters like favicon.io or convertio.co
+# 2. Create a 32x32 or 64x64 PNG image with WiFi/network symbols
+# 3. Convert PNG to ICO format
+#
+# Simple icon design suggestion:
+# - WiFi signal bars (📶)
+# - Network/connection symbol
+# - Blue and white colors
+# - Simple, recognizable design
+#
+# For now, the application will work without an icon file.
+# The icon.ico file is optional in the build process.
+
+# ASCII Art representation:
+#
+#     )))
+#    (((
+#   ___
+#  |___|
+#  |___|
+#    |
+#   📶
+#
+# This represents a WiFi tower/antenna with signal waves

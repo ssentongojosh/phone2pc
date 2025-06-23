@@ -1,163 +1,598 @@
+/* Dark mode variables */
+:root {
+  --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --text-color: #333;
+  --card-bg: rgba(255, 255, 255, 0.95);
+  --card-border: rgba(255, 255, 255, 0.2);
+  --input-bg: #f8f9fa;
+  --input-border: #e9ecef;
+  --hover-bg: #e3f2fd;
+  --success-bg: #e8f5e8;
+  --success-border: #4caf50;
+  --success-text: #2e7d32;
+  --folder-bg: #f8f9fa;
+  --folder-border: #e9ecef;
+  --folder-text: #2c3e50;
+  --shadow-color: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="dark"] {
+  --bg-gradient: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  --text-color: #e0e0e0;
+  --card-bg: rgba(30, 30, 30, 0.95);
+  --card-border: rgba(255, 255, 255, 0.1);
+  --input-bg: #2d2d2d;
+  --input-border: #404040;
+  --hover-bg: #3a3a3a;
+  --success-bg: #1e3a1e;
+  --success-border: #4caf50;
+  --success-text: #81c784;
+  --folder-bg: #2d2d2d;
+  --folder-border: #404040;
+  --folder-text: #e0e0e0;
+  --shadow-color: rgba(0, 0, 0, 0.3);
+}
+
+/* Auto dark mode based on system preference */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg-gradient: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    --text-color: #e0e0e0;
+    --card-bg: rgba(30, 30, 30, 0.95);
+    --card-border: rgba(255, 255, 255, 0.1);
+    --input-bg: #2d2d2d;
+    --input-border: #404040;
+    --hover-bg: #3a3a3a;
+    --success-bg: #1e3a1e;
+    --success-border: #4caf50;
+    --success-text: #81c784;
+    --folder-bg: #2d2d2d;
+    --folder-border: #404040;
+    --folder-text: #e0e0e0;
+    --shadow-color: rgba(0, 0, 0, 0.3);
+  }
+}
+
+/* Dark mode toggle button */
+.dark-mode-toggle {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: var(--card-bg);
+  border: 2px solid var(--card-border);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5em;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px var(--shadow-color);
+  backdrop-filter: blur(10px);
+  z-index: 1000;
+  outline: none;
+}
+
+.dark-mode-toggle:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 20px var(--shadow-color);
+}
+
+.dark-mode-toggle:focus {
+  outline: 2px solid #3498db;
+  outline-offset: 2px;
+}
+
+.dark-mode-toggle::before {
+  content: "🌙";
+  display: block;
+  font-size: 1.2em;
+}
+
+[data-theme="dark"] .dark-mode-toggle::before {
+  content: "☀️";
+}
+
+/* Ensure the button works on mobile */
+@media (max-width: 600px) {
+  .dark-mode-toggle {
+    top: 15px;
+    right: 15px;
+    width: 45px;
+    height: 45px;
+    font-size: 1.3em;
+  }
+}
+
+@media (max-width: 400px) {
+  .dark-mode-toggle {
+    top: 10px;
+    right: 10px;
+    width: 40px;
+    height: 40px;
+    font-size: 1.2em;
+  }
+}
+
 /* Basic styles (apply to all screen sizes) */
 body {
-    font-family: sans-serif;
-    margin: 0;
-    padding: 20px;
-    background-color: #f4f4f4;
-    color: #333;
-    /* Remove flex properties for the body on smaller screens, will handle layout within containers */
-    /* display: flex; */
-    /* flex-direction: column; */
-    /* align-items: center; */
-    /* justify-content: center; */
-    /* min-height: 100vh; */
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  padding: 20px;
+  background: var(--bg-gradient);
+  color: var(--text-color);
+  min-height: 100vh;
+  line-height: 1.6;
+  transition: all 0.3s ease;
 }
 
 h1 {
-    text-align: center;
-    color: #333;
-    margin-bottom: 30px;
+  text-align: center;
+  color: #fff;
+  margin-bottom: 30px;
+  font-size: 2.5em;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  animation: fadeInDown 0.8s ease-out;
+}
+
+h1::before {
+  content: "📶"; /* WiFi emoji */
+  font-size: 0.8em;
 }
 
 h2 {
-    color: #0056b3; /* Style for the folder structure heading */
-    margin-top: 20px; /* Add some space above the heading */
-    margin-bottom: 10px;
+  color: var(--folder-text);
+  margin-top: 20px;
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.4em;
+}
+
+h2::before {
+  content: "📁"; /* Folder emoji */
+  font-size: 0.9em;
 }
 
 form {
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    width: 100%;
-    max-width: 400px; /* Limit form width on larger screens */
-    text-align: center;
-    margin: 20px auto; /* Center the form and add margin */
+  background: var(--card-bg);
+  backdrop-filter: blur(10px);
+  padding: 30px;
+  border-radius: 20px;
+  box-shadow: 0 8px 32px var(--shadow-color);
+  border: 1px solid var(--card-border);
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+  margin: 20px auto;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+form::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #3498db, #2ecc71, #f39c12, #e74c3c);
+  border-radius: 20px 20px 0 0;
+}
+
+.file-input-wrapper {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+  margin-bottom: 25px;
 }
 
 input[type="file"] {
-    display: block;
-    width: 100%;
-    margin-bottom: 20px;
-    padding: 15px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box;
-    font-size: 1.1em;
+  opacity: 0;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+
+.file-input-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  padding: 20px;
+  border: 3px dashed #3498db;
+  border-radius: 12px;
+  background: var(--input-bg);
+  color: #3498db;
+  font-size: 1.1em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+.file-input-label:hover {
+  background: var(--hover-bg);
+  border-color: #2196f3;
+  transform: translateY(-2px);
+}
+
+.file-input-label::before {
+  content: "📤"; /* Upload emoji */
+  font-size: 1.3em;
+}
+
+.file-selected .file-input-label {
+  background: var(--success-bg);
+  border-color: var(--success-border);
+  color: var(--success-text);
+}
+
+.file-selected .file-input-label::before {
+  content: "✅"; /* Check mark emoji */
 }
 
 button[type="submit"] {
-    background-color: #5cb85c;
-    color: white;
-    padding: 15px 25px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 1.2em;
-    transition: background-color 0.3s ease;
+  background: linear-gradient(45deg, #4caf50, #45a049);
+  color: white;
+  padding: 18px 30px;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  font-size: 1.2em;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 button[type="submit"]:hover {
-    background-color: #4cae4c;
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
 }
 
-/* Styles for the file listing section (generated by the server) */
+button[type="submit"]::before {
+  content: "☁️"; /* Cloud emoji */
+  font-size: 1.1em;
+}
+
+button[type="submit"]:active {
+  transform: translateY(-1px);
+}
+
+/* Styles for the file listing section */
 #folder-structure {
-    width: 100%; /* Allow folder structure to take full width */
-    max-width: 600px; /* Optional: Limit width on larger screens */
-    margin: 20px auto; /* Center the folder structure and add margin */
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 600px;
+  margin: 30px auto;
+  background: var(--card-bg);
+  backdrop-filter: blur(10px);
+  padding: 25px;
+  border-radius: 20px;
+  box-shadow: 0 8px 32px var(--shadow-color);
+  border: 1px solid var(--card-border);
+  transition: all 0.3s ease;
 }
 
 #folder-structure ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
+  list-style: none;
+  padding: 0;
+  margin: 0;
 }
 
 #folder-structure li {
-    margin-bottom: 5px;
-    border-bottom: 1px solid #eee; /* Add a subtle separator */
-    padding: 10px 0; /* Adjust padding */
+  margin-bottom: 8px;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.2s ease;
+  background: var(--folder-bg);
+  border: 1px solid var(--folder-border);
 }
 
-#folder-structure li:last-child {
-    border-bottom: none; /* Remove border for the last item */
+#folder-structure li:hover {
+  transform: translateX(5px);
+  box-shadow: 0 4px 12px var(--shadow-color);
 }
 
 #folder-structure a {
-    text-decoration: none;
-    color: #007bff;
-    display: block; /* Make the whole list item area clickable */
-    padding: 10px; /* Increase clickable area for touch */
-    margin: -10px 0; /* Counteract the padding to maintain item spacing */
-    transition: background-color 0.2s ease; /* Add hover/tap feedback */
+  text-decoration: none;
+  color: var(--folder-text);
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 16px 20px;
+  transition: all 0.2s ease;
+  font-weight: 500;
+  position: relative;
 }
 
 #folder-structure a:hover,
 #folder-structure a:active {
-    background-color: #f9f9f9; /* Light background on hover/tap */
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
 }
 
-/* Optional: Style for file names (if not links) */
-#folder-structure li:not(:has(a)) {
-    color: #555; /* Dim color for non-clickable files */
+/* Add icons for different file types using Unicode/Emojis */
+#folder-structure a::before {
+  font-size: 1.3em;
+  width: 20px;
+  text-align: center;
+  flex-shrink: 0;
 }
 
+/* Folder icon for directories */
+#folder-structure a[href*="/"]::before {
+  content: "📁";
+}
+
+/* Back/parent directory icon */
+#folder-structure a[href*=".."]::before {
+  content: "⬅️";
+}
+
+/* File type icons using emojis */
+#folder-structure a[href$=".pdf"]::before {
+  content: "📄";
+}
+
+#folder-structure a[href$=".doc"]::before,
+#folder-structure a[href$=".docx"]::before {
+  content: "📝";
+}
+
+#folder-structure a[href$=".xls"]::before,
+#folder-structure a[href$=".xlsx"]::before {
+  content: "📊";
+}
+
+#folder-structure a[href$=".ppt"]::before,
+#folder-structure a[href$=".pptx"]::before {
+  content: "📊";
+}
+
+#folder-structure a[href$=".jpg"]::before,
+#folder-structure a[href$=".jpeg"]::before,
+#folder-structure a[href$=".png"]::before,
+#folder-structure a[href$=".gif"]::before,
+#folder-structure a[href$=".bmp"]::before {
+  content: "🖼️";
+}
+
+#folder-structure a[href$=".mp4"]::before,
+#folder-structure a[href$=".avi"]::before,
+#folder-structure a[href$=".mkv"]::before,
+#folder-structure a[href$=".mov"]::before {
+  content: "🎬";
+}
+
+#folder-structure a[href$=".mp3"]::before,
+#folder-structure a[href$=".wav"]::before,
+#folder-structure a[href$=".flac"]::before {
+  content: "🎵";
+}
+
+#folder-structure a[href$=".zip"]::before,
+#folder-structure a[href$=".rar"]::before,
+#folder-structure a[href$=".7z"]::before {
+  content: "🗜️";
+}
+
+#folder-structure a[href$=".txt"]::before {
+  content: "📄";
+}
+
+#folder-structure a[href$=".exe"]::before {
+  content: "⚙️";
+}
+
+#folder-structure a[href$=".apk"]::before {
+  content: "📱";
+}
+
+/* Default file icon */
+#folder-structure a:not([href*="/"])::before {
+  content: "📄";
+}
+
+/* Loading animation for buttons */
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.loading {
+  animation: pulse 1s infinite;
+}
+
+/* Add a subtle animation to the main heading */
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 
 /* Responsive styles for smaller screens */
 @media (max-width: 600px) {
-    body {
-        padding: 10px;
-    }
+  body {
+    padding: 15px;
+  }
 
-    h1 {
-        font-size: 1.8em; /* Adjust font size */
-        margin-bottom: 15px;
-    }
+  .dark-mode-toggle {
+    top: 15px;
+    right: 15px;
+    width: 45px;
+    height: 45px;
+    font-size: 1.3em;
+  }
 
-     h2 {
-        font-size: 1.4em; /* Adjust font size */
-        margin-top: 15px;
-        margin-bottom: 8px;
-    }
+  h1 {
+    font-size: 2em;
+    margin-bottom: 20px;
+  }
 
-    form {
-        padding: 15px;
-        margin: 15px auto;
-    }
+  h2 {
+    font-size: 1.3em;
+    margin-top: 15px;
+    margin-bottom: 12px;
+  }
 
-    input[type="file"],
-    button[type="submit"] {
-        padding: 12px;
-        font-size: 1em;
-    }
+  form {
+    padding: 25px 20px;
+    margin: 15px auto;
+    border-radius: 16px;
+  }
 
-    #folder-structure {
-        padding: 15px;
-        margin: 15px auto;
-    }
+  .file-input-label {
+    padding: 18px;
+    font-size: 1em;
+  }
 
-    #folder-structure li {
-        padding: 8px 0;
-    }
+  button[type="submit"] {
+    padding: 16px 25px;
+    font-size: 1.1em;
+  }
 
-     #folder-structure a {
-         padding: 8px;
-         margin: -8px 0;
-    }
+  #folder-structure {
+    padding: 20px;
+    margin: 20px auto;
+    border-radius: 16px;
+  }
+
+  #folder-structure li {
+    margin-bottom: 6px;
+  }
+
+  #folder-structure a {
+    padding: 14px 16px;
+    gap: 12px;
+  }
+
+  #folder-structure a::before {
+    font-size: 1.2em;
+  }
 }
 
-/* Add more specific styles for different screen sizes as needed */
 @media (max-width: 400px) {
-    h1 {
-        font-size: 1.5em;
-    }
-    h2 {
-        font-size: 1.2em;
-    }
+  .dark-mode-toggle {
+    top: 10px;
+    right: 10px;
+    width: 40px;
+    height: 40px;
+    font-size: 1.2em;
+  }
+
+  h1 {
+    font-size: 1.8em;
+    gap: 10px;
+  }
+
+  h2 {
+    font-size: 1.2em;
+  }
+
+  form {
+    padding: 20px 15px;
+  }
+
+  .file-input-label {
+    padding: 16px;
+    font-size: 0.95em;
+  }
+
+  button[type="submit"] {
+    padding: 14px 20px;
+    font-size: 1em;
+  }
+
+  #folder-structure {
+    padding: 15px;
+  }
+
+  #folder-structure a {
+    padding: 12px 14px;
+    gap: 10px;
+    font-size: 0.95em;
+  }
+}
+
+/* Back to upload button styling */
+.back-to-upload {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: linear-gradient(45deg, #667eea, #764ba2);
+  color: white;
+  text-decoration: none;
+  border-radius: 25px;
+  font-weight: 600;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  transition: all 0.3s ease;
+  margin-bottom: 20px;
+}
+
+.back-to-upload:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.back-to-upload::before {
+  content: "🏠";
+  font-size: 1.1em;
+}
+
+/* Success message styling */
+.success-message {
+  background: linear-gradient(45deg, #4caf50, #45a049);
+  color: white;
+  padding: 15px 20px;
+  border-radius: 12px;
+  margin: 20px auto;
+  max-width: 400px;
+  text-align: center;
+  box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-weight: 600;
+}
+
+.success-message::before {
+  content: "✅";
+  font-size: 1.2em;
+}
+
+/* Smooth transitions for dark mode */
+* {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
